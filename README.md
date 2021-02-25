@@ -25,3 +25,20 @@ LogME provides a dramatic speedup for assessing pre-trained models. The speedup 
 - We designed a fast algorithm to further speedup the computation of LogME.
 
 ![image-20210222204712553](imgs/image-20210222204712553.png)
+
+
+
+# Citation
+
+If you find it useful, please cite the following paper:
+
+```
+@article{you_logme:_2021,
+	title = {LogME: Practical Assessment of Pre-trained Models for Transfer Learning},
+	author = {You, Kaichao and Liu, Yong and Long, Mingsheng and Wang, Jianmin},
+	journal = {arxiv},
+	volume = {abs/2102.11005},
+	year = {2021},
+	url = {https://arxiv.org/abs/2102.11005},
+}
+```
