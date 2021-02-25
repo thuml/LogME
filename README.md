@@ -1,17 +1,6 @@
 # LogME
 LogME: Practical Assessment of Pre-trained Models for Transfer Learning
 
-# How to use
-
-Just feed the features ``f`` and labels ``y`` to the function, and you can get a nice score which well correlates with the transfer learning performance.
-
-```python
-from LogME import LogME
-score = LogME(f, y)
-```
-
-Then you can use the ``score``  to quickly select a good pre-trained model. The larger the ``score`` is,  the better transfer performance you get.
-
 # Experimental results
 
 We extensively validate the generality and superior performance of LogME on 14 pre-trained models and 17 downstream tasks, covering various pre-trained models (supervised pre-trained and unsupervised pre-trained), downstream tasks (classification and regression), and modalities (vision and language). Check the paper for all the results.
