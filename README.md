@@ -42,3 +42,7 @@ If you find it useful, please cite the following paper:
 	url = {https://arxiv.org/abs/2102.11005},
 }
 ```
+
+# Contact
+
+If you have any question or want to use the code, please contact youkaichao@gmail.com .
