@@ -10,10 +10,18 @@ By fitting the features ``f`` and labels ``y``, and you can get a nice score whi
 ```python
 from LogME import LogME
 logme = LogME(regression=False)
+# f has shape of [N, D], y has shape [N]
 score = logme.fit(f, y)
 ```
 
 Then you can use the ``score``  to quickly select a good pre-trained model. The larger the ``score`` is,  the better transfer performance you get.
+
+After fitting old data, logme can also be used to make prediction on new data:
+
+```python
+# f_test has shape of [N_test, D], prediction has shape [N]
+prediction = logme.predict(f_test)
+```
 
 # Experimental results
 
