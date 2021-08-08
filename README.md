@@ -1,13 +1,16 @@
 # LogME
-LogME: Practical Assessment of Pre-trained Models for Transfer Learning
+LogME: Practical Assessment of Pre-trained Models for Transfer Learning, ICML 2021
 
 # How to use
 
-Just feed the features ``f`` and labels ``y`` to the function, and you can get a nice score which well correlates with the transfer learning performance.
+The API looks like sci-kit learn: first initialize an object, and then fit it to your data.
+
+By fitting the features ``f`` and labels ``y``, and you can get a nice score which well correlates with the transfer learning performance (without hyper-parameter tuning).
 
 ```python
 from LogME import LogME
-score = LogME(f, y)
+logme = LogME(regression=False)
+score = logme.fit(f, y)
 ```
 
 Then you can use the ``score``  to quickly select a good pre-trained model. The larger the ``score`` is,  the better transfer performance you get.
@@ -44,13 +47,11 @@ LogME provides a dramatic speedup for assessing pre-trained models. The speedup 
 If you find it useful, please cite the following paper:
 
 ```
-@article{you_logme:_2021,
+@inproceedings{you_logme:_2021,
 	title = {LogME: Practical Assessment of Pre-trained Models for Transfer Learning},
-	author = {You, Kaichao and Liu, Yong and Long, Mingsheng and Wang, Jianmin},
-	journal = {arxiv},
-	volume = {abs/2102.11005},
-	year = {2021},
-	url = {https://arxiv.org/abs/2102.11005},
+	booktitle = {ICML},
+	author = {You, Kaichao and Liu, Yong and Wang, Jianmin and Long, Mingsheng},
+	year = {2021}
 }
 ```
 
