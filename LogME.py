@@ -94,6 +94,77 @@ class LogME(object):
         self.ms = np.stack(self.ms)
         return np.mean(evidences)
 
+    def fit_fixed_point(self, f: np.ndarray, y: np.ndarray):
+        """
+        :param f: [N, F], feature matrix from pre-trained model
+        :param y: target labels.
+            For classification, y has shape [N] with element in [0, C_t).
+            For regression, y has shape [N, C] with C regression-labels
+
+        :return: LogME score (how well f can fit y directly)
+        """
+        if self.fitted:
+            warnings.warn('re-fitting for new data. old parameters cleared.')
+            self.reset()
+        else:
+            self.fitted = True
+        f = f.astype(np.float64)
+        if self.regression:
+            y = y.astype(np.float64)
+            if len(y.shape) == 1:
+                y = y.reshape(-1, 1)
+
+        N, D = f.shape  # k = min(N, D)
+        u, s, vh = np.linalg.svd(f, full_matrices=False)
+        # u.shape = N x k
+        # s.shape = k
+        # vh.shape = k x D
+        s = s.reshape(-1, 1)
+        sigma = (s ** 2)
+
+        evidences = []
+        self.num_dim = y.shape[1] if self.regression else int(y.max() + 1)
+        for i in range(self.num_dim):
+            y_ = y[:, i] if self.regression else (y == i).astype(np.float64)
+            y_ = y_.reshape(-1, 1)
+            x = u.T @ y_  # x has shape [k, 1], but actually x should have shape [N, 1]
+            x2 = x ** 2
+            res_x2 = (y_ ** 2).sum() - x2.sum()  # if k < N, we compute sum of xi for 0 singular values directly
+
+            alpha, beta = 1.0, 1.0
+            for _ in range(11):
+                t = alpha / beta
+                gamma = (sigma / (sigma + t)).sum()
+                m2 = (sigma * x2 / ((t + sigma) ** 2)).sum()
+                res2 = (x2 / ((1 + sigma / t) ** 2)).sum() + res_x2
+                alpha = gamma / (m2 + 1e-5)
+                beta = (N - gamma) / (res2 + 1e-5)
+                t_ = alpha / beta
+                evidence = D / 2.0 * np.log(alpha) \
+                           + N / 2.0 * np.log(beta) \
+                           - 0.5 * np.sum(np.log(alpha + beta * sigma)) \
+                           - beta / 2.0 * res2 \
+                           - alpha / 2.0 * m2 \
+                           - N / 2.0 * np.log(2 * np.pi)
+                evidence /= N
+                if abs(t_ - t) / t <= 1e-3:  # abs(t_ - t) <= 1e-5 or abs(1 / t_ - 1 / t) <= 1e-5:
+                    break
+            evidence = D / 2.0 * np.log(alpha) \
+                       + N / 2.0 * np.log(beta) \
+                       - 0.5 * np.sum(np.log(alpha + beta * sigma)) \
+                       - beta / 2.0 * res2 \
+                       - alpha / 2.0 * m2 \
+                       - N / 2.0 * np.log(2 * np.pi)
+            evidence /= N
+            m = 1.0 / (t + sigma) * s * x
+            m = (vh.T @ m).reshape(-1)
+            evidences.append(evidence)
+            self.alphas.append(alpha)
+            self.betas.append(beta)
+            self.ms.append(m)
+        self.ms = np.stack(self.ms)
+        return np.mean(evidences)
+
     def predict(self, f: np.ndarray):
         """
         :param f: [N, F], feature matrix
