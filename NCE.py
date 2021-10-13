@@ -16,8 +16,10 @@ def NCE(source_label: np.ndarray, target_label: np.ndarray):
         s = int(s)
         t = int(t)
         joint[t, s] += 1.0 / N
-    p_target_given_source = (joint / joint.sum(axis=0, keepdims=True)).T  # P(y | z)
+    p_z = joint.sum(axis=0, keepdims=True)
+    p_target_given_source = (joint / p_z).T  # P(y | z)
+    mask = p_z.reshape(-1) != 0  # valid Z
+    p_target_given_source = p_target_given_source[mask] + 1e-20  # remove NaN where p(z) = 0, add 1e-20 to avoid log (0)
     entropy_y_given_z = np.sum(- p_target_given_source * np.log(p_target_given_source), axis=1, keepdims=True)
-    p_z = joint.sum(axis=0).reshape(-1, 1)
-    conditional_entropy = np.sum(entropy_y_given_z * p_z)
+    conditional_entropy = np.sum(entropy_y_given_z * p_z[mask])
     return - conditional_entropy
