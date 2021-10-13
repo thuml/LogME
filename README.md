@@ -23,6 +23,30 @@ After fitting old data, logme can also be used to make prediction on new data:
 prediction = logme.predict(f_test)
 ```
 
+
+# Code for LEEP and NCE
+
+We have received several requests for the code of LEEP and NCE, therefore we release the code in this repository to help the community.
+
+Please see the LEEP.py and NCE.py for details.
+
+Note that LEEP and NCE requires predictions over the pre-trained classes as input. The typical usage may look like:
+
+```python
+# get the prediction of shape [N, C_s] from the pre-trained model
+# N is the number of samples, C_s is the number of pre-trained classes
+import numpy as np
+from LEEP import LEEP
+from NCE import NCE
+
+pseudo_source_label = xxx
+target_label = xxx  # target_label has shape of [N], with its elements in [0, C_t)
+
+leep_score = LEEP(pseudo_source_label, target_label)
+nce_score = NCE(np.argmax(pseudo_source_label, axis=1), target_label)
+```
+
+
 # Experimental results
 
 We extensively validate the generality and superior performance of LogME on 14 pre-trained models and 17 downstream tasks, covering various pre-trained models (supervised pre-trained and unsupervised pre-trained), downstream tasks (classification and regression), and modalities (vision and language). Check the paper for all the results.
