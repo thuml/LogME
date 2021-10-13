@@ -44,6 +44,20 @@ f_tmp = np.random.randn(20, 50).astype(np.float64)
 each_evidence(np.random.randint(0, 2, 50).astype(np.float64), f_tmp, f_tmp.transpose(), np.eye(20, dtype=np.float64), np.ones(20, dtype=np.float64), np.eye(20, dtype=np.float64), 50, 20)
 
 
+@njit
+def truncated_svd(x):
+    u, s, vh = np.linalg.svd(x.transpose() @ x)
+    s = np.sqrt(s)
+    u_times_sigma = x @ vh.transpose()
+    k = np.sum((s > 1e-10) * 1) # rank of f
+    s = s.reshape(-1, 1)
+    s = s[:k]
+    vh = vh[:k]
+    u = u_times_sigma[:, :k] / s.reshape(1, -1)
+    return u, s, vh
+truncated_svd(np.random.randn(20, 10).astype(np.float64))
+
+
 class LogME(object):
     def __init__(self, regression=False):
         """
@@ -115,7 +129,10 @@ class LogME(object):
                 y = y.reshape(-1, 1)
 
         N, D = f.shape  # k = min(N, D)
-        u, s, vh = np.linalg.svd(f, full_matrices=False)
+        if N > D: # direct SVD may be expensive
+            u, s, vh = truncated_svd(f)
+        else:
+            u, s, vh = np.linalg.svd(f, full_matrices=False)
         # u.shape = N x k
         # s.shape = k
         # vh.shape = k x D
