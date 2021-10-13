@@ -17,7 +17,7 @@ def LEEP(pseudo_source_label: np.ndarray, target_label: np.ndarray):
         this_class = normalized_prob[target_label == i]
         row = np.sum(this_class, axis=0)
         joint[i] = row
-    p_target_given_source = (joint / joint.sum(axis=1, keepdims=True)).T  # P(y | z)
+    p_target_given_source = (joint / joint.sum(axis=0, keepdims=True)).T  # P(y | z)
 
     empirical_prediction = pseudo_source_label @ p_target_given_source
     empirical_prob = np.array([predict[label] for predict, label in zip(empirical_prediction, target_label)])
