@@ -26,9 +26,19 @@ Then you can use the ``score``  to quickly select a good pre-trained model. The 
 
 Meanwhile, the LogME score can also be used to purely measure the compatibility/transferability between features and labels, just like [this paper](https://arxiv.org/abs/2109.01087) from UC Berkeley. 
 
-## Use B-Tuning to fine-tune with multiple (heterogeneous) pre-trained models
+## Ranking and Tuning pre-trained models
 
-This is the second step in the proposed "ranking and tuning" paradigm. Code is coming soon.
+### Ranking pre-trained models
+
+``ranking.py`` contains example code to rank pre-trained models, as well as to save the bayesian weight (m in LogME) for later B-Tuning.
+
+### Tuning with multiple (heterogeneous) pre-trained models by B-Tuning
+
+``b_tuning.py`` contains example code of the proposed B-Tuning. Typically, we can use the top-K model from the output of ``ranking.py``, just as follows:
+
+```shell
+python b_tuning.py --dataset aircraft --model resnet50 --teachers densenet121 mobilenet_v2 googlenet --tradeoff 100
+```
 
 # Code for LEEP and NCE
 
