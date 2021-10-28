@@ -24,13 +24,6 @@ score = logme.fit(f, y)
 
 Then you can use the ``score``  to quickly select a good pre-trained model. The larger the ``score`` is,  the better transfer performance you get.
 
-After fitting old data, logme can also be used to make prediction on new data:
-
-```python
-# f_test has shape of [N_test, D], prediction has shape [N]
-prediction = logme.predict(f_test)
-```
-
 Meanwhile, the LogME score can also be used to purely measure the compatibility/transferability between features and labels, just like [this paper](https://arxiv.org/abs/2109.01087) from UC Berkeley. 
 
 ## Use B-Tuning to fine-tune with multiple (heterogeneous) pre-trained models
