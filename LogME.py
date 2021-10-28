@@ -192,34 +192,3 @@ class LogME(object):
         if self.regression:
             return logits
         return np.argmax(logits, axis=-1)
-
-    def probability(self, f: np.ndarray, y: np.ndarray):
-        """
-        :param f: [N, F], feature matrix
-        :param y: target labels.
-            For classification, y has shape [N] with element in [0, C_t).
-            For regression, y has shape [N, C] with C regression-labels
-
-        :return: probability score (how well each f can fit each y directly), return shape [N]
-        """
-        if not self.fitted:
-            raise RuntimeError("not fitted, please call fit first")
-        f = f.astype(np.float64)
-        if self.regression:
-            y = y.astype(np.float64)
-        scores = []
-        D = f.shape[1]
-        for i in range(self.num_dim):
-            alpha = self.alphas[i]
-            beta = self.betas[i]
-            y_ = y[:, i] if self.regression else (y == i).astype(np.float64)
-            common_term = 0.5 * np.log(beta) + D / 2 * np.log(alpha) - 0.5 * np.log(2 * np.pi)
-            beta_uTu = beta * np.sum((f * f), axis=1, keepdims=True)
-            ms_de = alpha + beta_uTu
-            ms = beta * y_.reshape(-1, 1) * f / ms_de
-            logdetAs = (D - 1) * np.log(alpha) + np.log(ms_de.reshape(-1))
-            err = (np.sum(ms * f, axis=1) - y_) ** 2
-            ms_norm = np.sum(ms * ms, axis=1)
-            ans = common_term - 0.5 * beta * err - 0.5 * alpha * ms_norm - 0.5 * logdetAs
-            scores.append(ans)
-        return np.mean(np.stack(scores), axis=0)
