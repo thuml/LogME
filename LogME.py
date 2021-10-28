@@ -49,7 +49,7 @@ def truncated_svd(x):
     u, s, vh = np.linalg.svd(x.transpose() @ x)
     s = np.sqrt(s)
     u_times_sigma = x @ vh.transpose()
-    k = np.sum((s > 1e-10) * 1) # rank of f
+    k = np.sum((s > 1e-10) * 1)  # rank of f
     s = s.reshape(-1, 1)
     s = s[:k]
     vh = vh[:k]
@@ -73,24 +73,12 @@ class LogME(object):
         self.betas = []
         self.ms = []
 
-    def fit(self, f: np.ndarray, y: np.ndarray):
+    def _fit_icml(self, f: np.ndarray, y: np.ndarray):
         """
-        :param f: [N, F], feature matrix from pre-trained model
-        :param y: target labels.
-            For classification, y has shape [N] with element in [0, C_t).
-            For regression, y has shape [N, C] with C regression-labels
-
-        :return: LogME score (how well f can fit y directly)
+        LogME calculation proposed in the ICML 2021 paper
+        "LogME: Practical Assessment of Pre-trained Models for Transfer Learning"
+        at http://proceedings.mlr.press/v139/you21b.html
         """
-        if self.fitted:
-            warnings.warn('re-fitting for new data. old parameters cleared.')
-            self.reset()
-        else:
-            self.fitted = True
-        f = f.astype(np.float64)
-        if self.regression:
-            y = y.astype(np.float64)
-
         fh = f
         f = f.transpose()
         D, N = f.shape
@@ -108,26 +96,12 @@ class LogME(object):
         self.ms = np.stack(self.ms)
         return np.mean(evidences)
 
-    def fit_fixed_point(self, f: np.ndarray, y: np.ndarray):
+    def _fit_fixed_point(self, f: np.ndarray, y: np.ndarray):
         """
-        :param f: [N, F], feature matrix from pre-trained model
-        :param y: target labels.
-            For classification, y has shape [N] with element in [0, C_t).
-            For regression, y has shape [N, C] with C regression-labels
-
-        :return: LogME score (how well f can fit y directly)
+        LogME calculation proposed in the arxiv 2021 paper
+        "Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs"
+        at https://arxiv.org/abs/2110.10545
         """
-        if self.fitted:
-            warnings.warn('re-fitting for new data. old parameters cleared.')
-            self.reset()
-        else:
-            self.fitted = True
-        f = f.astype(np.float64)
-        if self.regression:
-            y = y.astype(np.float64)
-            if len(y.shape) == 1:
-                y = y.reshape(-1, 1)
-
         N, D = f.shape  # k = min(N, D)
         if N > D: # direct SVD may be expensive
             u, s, vh = truncated_svd(f)
@@ -181,6 +155,29 @@ class LogME(object):
             self.ms.append(m)
         self.ms = np.stack(self.ms)
         return np.mean(evidences)
+
+    _fit = _fit_fixed_point
+
+    def fit(self, f: np.ndarray, y: np.ndarray):
+        """
+        :param f: [N, F], feature matrix from pre-trained model
+        :param y: target labels.
+            For classification, y has shape [N] with element in [0, C_t).
+            For regression, y has shape [N, C] with C regression-labels
+
+        :return: LogME score (how well f can fit y directly)
+        """
+        if self.fitted:
+            warnings.warn('re-fitting for new data. old parameters cleared.')
+            self.reset()
+        else:
+            self.fitted = True
+        f = f.astype(np.float64)
+        if self.regression:
+            y = y.astype(np.float64)
+            if len(y.shape) == 1:
+                y = y.reshape(-1, 1)
+        return self._fit(f, y)
 
     def predict(self, f: np.ndarray):
         """
