@@ -69,9 +69,10 @@ class LogME(object):
 
     def reset(self):
         self.num_dim = 0
-        self.alphas = []
-        self.betas = []
-        self.ms = []
+        self.alphas = []  # alpha for each class / dimension
+        self.betas = []  # beta for each class / dimension
+        # self.ms.shape --> [C, D]
+        self.ms = []  # m for each class / dimension
 
     def _fit_icml(self, f: np.ndarray, y: np.ndarray):
         """
