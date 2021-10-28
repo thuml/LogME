@@ -1,5 +1,6 @@
 # LogME
 LogME: Practical Assessment of Pre-trained Models for Transfer Learning, ICML 2021
+Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs, [arxiv](https://arxiv.org/abs/2110.10545) 2021
 
 # How to use
 
@@ -76,13 +77,20 @@ LogME provides a dramatic speedup for assessing pre-trained models. The speedup 
 
 # Citation
 
-If you find it useful, please cite the following paper:
+If you find the code useful, please cite the following papers:
 
 ```
 @inproceedings{you_logme:_2021,
 	title = {LogME: Practical Assessment of Pre-trained Models for Transfer Learning},
 	booktitle = {ICML},
 	author = {You, Kaichao and Liu, Yong and Wang, Jianmin and Long, Mingsheng},
+	year = {2021}
+}
+
+@article{you_ranking_2021,
+	title = {Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs},
+	journal = {arXiv:2110.10545 [cs]},
+	author = {You, Kaichao and Liu, Yong and Wang, Jianmin and Jordan, Michael I. and Long, Mingsheng},
 	year = {2021}
 }
 ```
