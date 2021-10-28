@@ -1,10 +1,17 @@
 # LogME
-LogME: Practical Assessment of Pre-trained Models for Transfer Learning, ICML 2021
-Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs, [arxiv](https://arxiv.org/abs/2110.10545) 2021
+This is the codebase for the following two papers:
+
+- [LogME: Practical Assessment of Pre-trained Models for Transfer Learning](http://proceedings.mlr.press/v139/you21b.html), ICML 2021
+
+- [Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs](https://arxiv.org/abs/2110.10545), arxiv 2021
+
+**Note**: the second paper is an extended version of the first conference paper.
 
 # How to use
 
-The API looks like sci-kit learn: first initialize an object, and then fit it to your data.
+## Use LogME to assess transferability
+
+The API looks like sci-kit learn: first initialize an object, and then fit it to your data to get the transferability metric.
 
 By fitting the features ``f`` and labels ``y``, and you can get a nice score which well correlates with the transfer learning performance (without hyper-parameter tuning).
 
@@ -24,6 +31,11 @@ After fitting old data, logme can also be used to make prediction on new data:
 prediction = logme.predict(f_test)
 ```
 
+Meanwhile, the LogME score can also be used to purely measure the compatibility/transferability between features and labels, just like [this paper](https://arxiv.org/abs/2109.01087) from UC Berkeley. 
+
+## Use B-Tuning to fine-tune with multiple (heterogeneous) pre-trained models
+
+This is the second step in the proposed "ranking and tuning" paradigm. Code is coming soon.
 
 # Code for LEEP and NCE
 
@@ -46,34 +58,6 @@ target_label = xxx  # target_label has shape of [N], with its elements in [0, C_
 leep_score = LEEP(pseudo_source_label, target_label)
 nce_score = NCE(np.argmax(pseudo_source_label, axis=1), target_label)
 ```
-
-
-# Experimental results
-
-We extensively validate the generality and superior performance of LogME on 14 pre-trained models and 17 downstream tasks, covering various pre-trained models (supervised pre-trained and unsupervised pre-trained), downstream tasks (classification and regression), and modalities (vision and language). Check the paper for all the results.
-
-## Computer vision
-
-9 datasets and 10 pre-trained models. LogME is a reasonably good indicator for transfer performance.
-
-![image-20210222204141915](imgs/image-20210222204141915.png)
-
-## NLP
-
-7 tasks and 4 pre-trained models. LogME is a good indicator for transfer performance.
-
-![image-20210222204350389](imgs/image-20210222204350389.png)
-
-# Speedup
-
-LogME provides a dramatic speedup for assessing pre-trained models. The speedup comes from two aspects:
-
-- LogME does not need hyper-parameter tuning whereas vanilla fine-tuning requires extensive hyper-parameter tuning.
-- We designed a fast algorithm to further speedup the computation of LogME.
-
-![image-20210222204712553](imgs/image-20210222204712553.png)
-
-
 
 # Citation
 
