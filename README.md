@@ -32,13 +32,32 @@ Meanwhile, the LogME score can also be used to purely measure the compatibility/
 
 ``ranking.py`` contains example code to rank pre-trained models, as well as to save the bayesian weight (m in LogME) for later B-Tuning.
 
+You may get some outputs like the following:
+
+```text
+Models ranking on aircraft:
+[('resnet152', 0.9501244943998941),
+ ('resnet101', 0.948006158997241),
+ ('mnasnet1_0', 0.947849273046989),
+ ('resnet50', 0.9464738509680248),
+ ('densenet169', 0.9434405008356792),
+ ('densenet201', 0.9422277504393521),
+ ('mobilenet_v2', 0.9412819194598648),
+ ('inception_v3', 0.9398580258195871),
+ ('densenet121', 0.9382284242364975),
+ ('googlenet', 0.9338037297080976),
+ ('resnet34', 0.9301353924624043)]
+```
+
 ### Tuning with multiple (heterogeneous) pre-trained models by B-Tuning
 
-``b_tuning.py`` contains example code of the proposed B-Tuning. Typically, we can use the top-K model from the output of ``ranking.py``, just as follows:
+``b_tuning.py`` contains example code of the proposed B-Tuning. Typically, we can use the top-K models from the output of ``ranking.py``, just as follows:
 
 ```shell
-python b_tuning.py --dataset aircraft --model resnet50 --teachers densenet121 mobilenet_v2 googlenet --tradeoff 100
+python b_tuning.py --dataset aircraft --model resnet50 --teachers resnet152 resnet101 mnasnet1_0 --tradeoff 100
 ```
+
+Note that we use K=3 here, so the teachers are resnet152/resnet101/mnasnet1_0. We found K=3 is a good choice in general.
 
 # Code for LEEP and NCE
 
