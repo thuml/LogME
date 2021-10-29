@@ -6,6 +6,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from LogME import LogME
+import pprint
 
 models_hub = ['mobilenet_v2', 'mnasnet1_0', 'densenet121', 'densenet169', 'densenet201',
               'resnet34', 'resnet50', 'resnet101', 'resnet152', 'googlenet', 'inception_v3']
@@ -71,12 +72,10 @@ def main():
     configs = get_configs()
     torch.cuda.set_device(configs.gpu)
 
-    image_size = 299 if configs.model == 'inception_v3' else 224
-
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
     transform=transforms.Compose([
-                transforms.Resize((image_size, image_size)),
+                transforms.Resize((224, 224)),
                 transforms.ToTensor(),
                 normalize
             ])
@@ -89,13 +88,15 @@ def main():
 
     score_loader = DataLoader(score_dataset, batch_size=configs.batch_size, shuffle=False,
                         num_workers=configs.num_workers, pin_memory=True)
+    if not os.path.isdir(f'logme_{configs.dataset}'):
+        os.mkdir(f'logme_{configs.dataset}')
     score_dict = {}
     for model in models_hub:
         configs.model = model
         score_dict[model] = score_model(configs, score_loader)
     results = sorted(score_dict.items(), key=lambda i: i[1], reverse=True)
     print(f'Models ranking on {configs.dataset}: ')
-    print(results)
+    pprint.pprint(results)
 
 
 def score_model(configs, score_loader):
@@ -125,11 +126,9 @@ def score_model(configs, score_loader):
     score = logme.fit(features.numpy(), targets.numpy())
 
     # save calculated bayesian weight
-    if not os.path.isdir(f'logme_{configs.dataset}'):
-        os.mkdir(f'features_{configs.dataset}')
     torch.save(logme.ms, f'logme_{configs.dataset}/weight_{configs.model}')
 
-    print(f'LogME: {score}\n')
+    print(f'LogME of {configs.model}: {score}\n')
     return score
     
 

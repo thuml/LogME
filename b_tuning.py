@@ -171,14 +171,6 @@ def train(configs, train_loader, val_loader, test_loaders, net, teachers):
     criterion_cls = nn.CrossEntropyLoss()
     criterion_dis = nn.MSELoss()
 
-    # for inception v3, the input image should be resized to 299
-    if 'inception_v3' in configs.teachers:
-        upsampler = nn.Upsample(size=299, mode='bilinear')
-        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-        normalize_re = transforms.Normalize(mean=[-0.485/0.229, -0.456/0.224, -0.406/0.225],
-                                     std=[1.0/0.229, 1.0/0.224, 1.0/0.225])
-
     # start training
     for iter_num in range(configs.total_iter):
         net.train()
@@ -206,10 +198,7 @@ def train(configs, train_loader, val_loader, test_loaders, net, teachers):
         source_features = torch.zeros_like(target_features)
         for teacher in teachers:
             with torch.no_grad():
-                if teacher['name'] == 'inception_v3':
-                    input = normalize(upsampler(normalize_re(train_inputs)))
-                else:
-                    input = train_inputs
+                input = train_inputs
                 source_features += torch.matmul(teacher['model'](input), teacher['weight'].t())
                 
         source_features = source_features / len(teachers)
