@@ -101,7 +101,7 @@ def get_data_loader(configs):
             os.path.join(configs.data_path, 'train'),
             transform=data_transforms['train'])
         val_dataset = datasets.ImageFolder(
-            os.path.join(configs.data_path, 'test'),
+            os.path.join(configs.data_path, 'val'),
             transform=data_transforms['val'])
         test_datasets = {
             'test' + str(i):
