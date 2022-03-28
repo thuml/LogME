@@ -74,25 +74,28 @@ def main():
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
-    transform=transforms.Compose([
-                transforms.Resize((224, 224)),
-                transforms.ToTensor(),
-                normalize
-            ])
 
-    if configs.dataset == 'aircraft':
-        score_dataset = datasets.ImageFolder(configs.data_path, transform=transform)
-    else:
-        # try your customized dataset
-        raise NotImplementedError
-
-    score_loader = DataLoader(score_dataset, batch_size=configs.batch_size, shuffle=False,
-                        num_workers=configs.num_workers, pin_memory=True)
     if not os.path.isdir(f'logme_{configs.dataset}'):
         os.mkdir(f'logme_{configs.dataset}')
     score_dict = {}
     for model in models_hub:
         configs.model = model
+        if model == 'inception_v3': # inception_v3 is pretrained on 299x299 images
+            transform=transforms.Compose([  
+                transforms.Resize((299, 299)),
+                transforms.ToTensor(),
+                normalize
+            ])
+        else:
+            transform=transforms.Compose([  # other models are pretrained on 224x224 images
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                normalize
+            ])
+        score_dataset = datasets.ImageFolder(configs.data_path, transform=transform)
+        # or try your customized dataset
+        score_loader = DataLoader(score_dataset, batch_size=configs.batch_size, shuffle=False,
+            num_workers=configs.num_workers, pin_memory=True)
         score_dict[model] = score_model(configs, score_loader)
     results = sorted(score_dict.items(), key=lambda i: i[1], reverse=True)
     print(f'Models ranking on {configs.dataset}: ')
@@ -107,6 +110,7 @@ def score_model(configs, score_loader):
     else:
         model = models.__dict__[configs.model](pretrained=True).cuda()
 
+    # different models has different linear projection names
     if configs.model in ['mobilenet_v2', 'mnasnet1_0']:
         fc_layer = model.classifier[-1]
     elif configs.model in ['densenet121', 'densenet169', 'densenet201']:
