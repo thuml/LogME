@@ -15,10 +15,30 @@ The API looks like sci-kit learn: first initialize an object, and then fit it to
 
 By fitting the features ``f`` and labels ``y``, and you can get a nice score which well correlates with the transfer learning performance (without hyper-parameter tuning).
 
+**(1) For classification task:** 
+
 ```python
 from LogME import LogME
 logme = LogME(regression=False)
 # f has shape of [N, D], y has shape [N]
+score = logme.fit(f, y)
+```
+
+**(2) For multi-label classification task:** 
+
+```python
+from LogME import LogME
+logme = LogME(regression=True)
+# f has shape of [N, D], y has shape [N, C] being the multi-label vector.
+score = logme.fit(f, y)
+```
+
+**(3) For regression task:** 
+
+```python
+from LogME import LogME
+logme = LogME(regression=True)
+# f has shape of [N, D], y has shape [N, C] with C regression-labels
 score = logme.fit(f, y)
 ```
 
