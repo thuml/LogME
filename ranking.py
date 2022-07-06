@@ -9,7 +9,7 @@ from LogME import LogME
 import pprint
 
 models_hub = ['mobilenet_v2', 'mnasnet1_0', 'densenet121', 'densenet169', 'densenet201',
-              'resnet34', 'resnet50', 'resnet101', 'resnet152', 'googlenet', 'inception_v3']
+               'resnet34', 'resnet50', 'resnet101', 'resnet152', 'googlenet', 'inception_v3']
 
 
 def get_configs():
@@ -22,7 +22,7 @@ def get_configs():
     # dataset
     parser.add_argument('--dataset', default="aircraft",
                         type=str, help='Name of dataset')
-    parser.add_argument('--data_path', default="./data/FGVCAircraft/train",
+    parser.add_argument('--data_path', default="/data/FGVCAircraft/train",
                         type=str, help='Path of dataset')
     parser.add_argument('--num_workers', default=2, type=int,
                         help='Num of workers used in dataloading')
@@ -98,6 +98,7 @@ def main():
             num_workers=configs.num_workers, pin_memory=True)
         score_dict[model] = score_model(configs, score_loader)
     results = sorted(score_dict.items(), key=lambda i: i[1], reverse=True)
+    torch.save(score_dict, f'logme_{configs.dataset}/results.pth')
     print(f'Models ranking on {configs.dataset}: ')
     pprint.pprint(results)
 
@@ -130,7 +131,7 @@ def score_model(configs, score_loader):
     score = logme.fit(features.numpy(), targets.numpy())
 
     # save calculated bayesian weight
-    torch.save(logme.ms, f'logme_{configs.dataset}/weight_{configs.model}')
+    torch.save(logme.ms, f'logme_{configs.dataset}/weight_{configs.model}.pth')
 
     print(f'LogME of {configs.model}: {score}\n')
     return score

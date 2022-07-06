@@ -50,7 +50,14 @@ Meanwhile, the LogME score can also be used to purely measure the compatibility/
 
 ### Ranking pre-trained models
 
-``ranking.py`` contains example code to rank pre-trained models, as well as to save the bayesian weight (m in LogME) for later B-Tuning.
+``ranking.py`` contains example code to rank pre-trained models, as well as to save the bayesian weight (m in LogME) for later B-Tuning 
+
+
+FGVCAircraft dataset can be downloaded [here](https://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/)).
+
+```shell
+python ranking.py --dataset aircraft --data_path ./data/FGVCAircraft
+```
 
 You may get some outputs like the following:
 
@@ -74,7 +81,7 @@ Models ranking on aircraft:
 ``b_tuning.py`` contains example code of the proposed B-Tuning. Typically, we can use the top-K models from the output of ``ranking.py``, just as follows:
 
 ```shell
-python b_tuning.py --dataset aircraft --model resnet50 --teachers resnet152 resnet101 mnasnet1_0 --tradeoff 100
+python b_tuning.py --dataset aircraft --data_path ./data/FGVCAircraft --model resnet50 --teachers resnet152 resnet101 mnasnet1_0 --tradeoff 100
 ```
 
 Note that we use K=3 here, so the teachers are resnet152/resnet101/mnasnet1_0. We found K=3 is a good choice in general.

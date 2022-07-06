@@ -47,7 +47,7 @@ def get_configs():
     parser.add_argument('--model', default="resnet50", choices=models_list,
                         type=str, help='Name of NN')
     parser.add_argument('--teachers', nargs='+', help='Names of teahcer models')
-    parser.add_argument('--class_num', default="100",
+    parser.add_argument('--class_num', default="196",
                         type=int, help='class number')
 
     # optimizer
@@ -71,7 +71,8 @@ def get_configs():
                         type=str, help='Path of saved models')
     parser.add_argument('--visual_dir', default="visual",
                         type=str, help='Path of tensorboard data for training')
-
+    parser.add_argument('--temperature', default=0.1, type=float,
+                        metavar='P', help='temperature of logme weight')
     parser.add_argument('--tradeoff', default=100,
                         type=float, help='b-tuning tradeoff')
     configs = parser.parse_args()
@@ -101,8 +102,8 @@ def get_data_loader(configs):
             os.path.join(configs.data_path, 'train'),
             transform=data_transforms['train'])
         val_dataset = datasets.ImageFolder(
-            os.path.join(configs.data_path, 'val'),
-            transform=data_transforms['val'])
+            os.path.join(configs.data_path, 'test'),
+            transform=data_transforms['train'])
         test_datasets = {
             'test' + str(i):
                 datasets.ImageFolder(
@@ -144,7 +145,13 @@ def set_seeds(seed):
 def train(configs, train_loader, val_loader, test_loaders, net, teachers):
     train_len = len(train_loader) - 1
     train_iter = iter(train_loader)
-    weight = torch.from_numpy(torch.load(f'logme_{configs.dataset}/weight_{configs.model}')).float().cuda()
+    weight = torch.from_numpy(torch.load(f'logme_{configs.dataset}/weight_{configs.model}.pth')).float().cuda()
+
+    logmes = torch.load(f'logme_{configs.dataset}/results.pth')
+    pi = []
+    for teacher in teachers:
+        pi.append(logmes[teacher['name']])
+    pi = torch.softmax(torch.tensor(pi) / configs.temperature, dim=0).float().cuda()
 
     # different learning rates for different layers
     params_list = [{"params": filter(lambda p: p.requires_grad, net.f_net.parameters())},
@@ -196,12 +203,11 @@ def train(configs, train_loader, val_loader, test_loaders, net, teachers):
         target_features = torch.matmul(train_features, weight.t())
             
         source_features = torch.zeros_like(target_features)
-        for teacher in teachers:
+        for i, teacher in enumerate(teachers):
             with torch.no_grad():
                 input = train_inputs
-                source_features += torch.matmul(teacher['model'](input), teacher['weight'].t())
-                
-        source_features = source_features / len(teachers)
+                source_features += pi[i] * torch.matmul(teacher['model'](input), teacher['weight'].t())
+
         classifier_loss = criterion_cls(train_outputs, train_labels)
         b_tuning_loss = criterion_dis(target_features, source_features.detach())
         loss = classifier_loss + configs.tradeoff * b_tuning_loss
@@ -310,7 +316,7 @@ def main():
         model_t_feat = load_model(configs, only_feature=True).cuda().eval()      
         model_t = {'name':teacher_name,
                    'model': model_t_feat,
-                   'weight': torch.from_numpy(torch.load(f'logme_{configs.dataset}/weight_{teacher_name}')).float().cuda()
+                   'weight': torch.from_numpy(torch.load(f'logme_{configs.dataset}/weight_{teacher_name}.pth')).float().cuda()
                   }
         teachers.append(model_t)
 
