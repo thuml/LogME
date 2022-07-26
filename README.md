@@ -3,7 +3,7 @@ This is the codebase for the following two papers:
 
 - [LogME: Practical Assessment of Pre-trained Models for Transfer Learning](http://proceedings.mlr.press/v139/you21b.html), ICML 2021
 
-- [Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs](https://arxiv.org/abs/2110.10545), arxiv 2021
+- [Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs](https://arxiv.org/abs/2110.10545), JMLR 2022
 
 **Note**: the second paper is an extended version of the first conference paper.
 
@@ -90,7 +90,7 @@ Note that we use K=3 here, so the teachers are resnet152/resnet101/mnasnet1_0. W
 
 We have received several requests for the code of LEEP and NCE, therefore we release the code in this repository to help the community.
 
-Please see the LEEP.py and NCE.py for details.
+Please see the LEEP.py and NCE.py for details. LEEP/NCE in the paper were calculated by historical code with bugs. New results are available [here](https://github.com/WenWeiTHU/Transfer-Learning-Library/tree/dev-tllib/examples/model_adaption/model_selection), calculated by the LEEP/NCE code in this repo.
 
 Note that LEEP and NCE requires predictions over the pre-trained classes as input. The typical usage may look like:
 
