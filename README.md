@@ -3,7 +3,7 @@ This is the codebase for the following two papers:
 
 - [LogME: Practical Assessment of Pre-trained Models for Transfer Learning](http://proceedings.mlr.press/v139/you21b.html), ICML 2021
 
-- [Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs](https://arxiv.org/abs/2110.10545), JMLR 2022
+- [Ranking and Tuning Pre-trained Models: A New Paradigm for Exploiting Model Hubs](https://arxiv.org/abs/2110.10545), JMLR 2022
 
 **Note**: the second paper is an extended version of the first conference paper.
 
@@ -120,11 +120,11 @@ If you find the code useful, please cite the following papers:
 	year = {2021}
 }
 
-@article{you_ranking_2021,
-	title = {Ranking and Tuning Pre-trained Models: A New Paradigm of Exploiting Model Hubs},
-	journal = {arXiv:2110.10545 [cs]},
-	author = {You, Kaichao and Liu, Yong and Wang, Jianmin and Jordan, Michael I. and Long, Mingsheng},
-	year = {2021}
+@article{you_ranking_2022,
+	title = {Ranking and Tuning Pre-trained Models: A New Paradigm for Exploiting Model Hubs},
+	journal = {JMLR},
+	author = {You, Kaichao and Liu, Yong and Zhang, Ziyang and Wang, Jianmin and Jordan, Michael I. and Long, Mingsheng},
+	year = {2022}
 }
 ```
 
