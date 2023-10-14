@@ -113,6 +113,9 @@ class LogME(object):
         # vh.shape = k x D
         s = s.reshape(-1, 1)
         sigma = (s ** 2)
+        sigma_full_size = sigma
+        if N < D:  # pad sigma to size D
+            sigma_full_size = np.pad(sigma, ((0, D - N), (0, 0)), 'constant')
 
         evidences = []
         self.num_dim = y.shape[1] if self.regression else int(y.max() + 1)
@@ -134,7 +137,7 @@ class LogME(object):
                 t_ = alpha / beta
                 evidence = D / 2.0 * np.log(alpha) \
                            + N / 2.0 * np.log(beta) \
-                           - 0.5 * np.sum(np.log(alpha + beta * sigma)) \
+                           - 0.5 * np.sum(np.log(alpha + beta * sigma_full_size)) \
                            - beta / 2.0 * res2 \
                            - alpha / 2.0 * m2 \
                            - N / 2.0 * np.log(2 * np.pi)
@@ -143,7 +146,7 @@ class LogME(object):
                     break
             evidence = D / 2.0 * np.log(alpha) \
                        + N / 2.0 * np.log(beta) \
-                       - 0.5 * np.sum(np.log(alpha + beta * sigma)) \
+                       - 0.5 * np.sum(np.log(alpha + beta * sigma_full_size)) \
                        - beta / 2.0 * res2 \
                        - alpha / 2.0 * m2 \
                        - N / 2.0 * np.log(2 * np.pi)
